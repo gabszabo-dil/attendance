@@ -7,97 +7,402 @@
   <meta name="description" content="Office attendance tracker PWA">
   <title>Office Tracker</title>
   <link rel="manifest" href="manifest.json">
-  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Custom styles for better mobile experience */
+    /* Atlas Design Tokens */
+    :root {
+      /* Colors */
+      --lens-semantic-color-surface-default: #ffffff;
+      --lens-semantic-color-surface-variant: #f7f8f9;
+      --lens-semantic-color-surface-subtle: #fafbfc;
+      --lens-semantic-color-background-base: #ffffff;
+      --lens-semantic-color-background-container: #f7f8f9;
+      --lens-semantic-color-type-default: #282e37;
+      --lens-semantic-color-type-muted: #5c6470;
+      --lens-semantic-color-type-disabled: #a0a2a5;
+      --lens-semantic-color-action-primary-default: #282e37;
+      --lens-semantic-color-action-primary-hover: #3d4551;
+      --lens-semantic-color-action-primary-active: #0f1419;
+      --lens-semantic-color-action-primary-on-primary: #ffffff;
+      --lens-semantic-color-action-secondary-variant: #eeeff0;
+      --lens-semantic-color-action-secondary-hover-fill: #f7f8f9;
+      --lens-semantic-color-action-secondary-active-fill: #eeeff0;
+      --lens-semantic-color-action-secondary-on-secondary: #282e37;
+      --lens-semantic-color-action-secondary-outline: #282e37;
+      --lens-semantic-color-outline-fixed: #cccdce;
+      --lens-semantic-color-status-success-background: #f0faf0;
+      --lens-semantic-color-status-success-text: #1f7a1f;
+      --lens-semantic-color-status-error-background: #fef0f0;
+      --lens-semantic-color-status-error-text: #921a1d;
+      --lens-semantic-color-ui-divider-default: #cccdce;
+      --lens-core-color-green-50: #1f7a1f;
+      --lens-core-color-red-50: #921a1d;
+      --lens-core-color-purple-50: #642fcf;
+      --lens-core-color-gray-100: #f7f8f9;
+      --lens-core-color-gray-200: #eeeff0;
+      --lens-core-color-gray-300: #cccdce;
+      --lens-core-color-gray-500: #a0a2a5;
+      --lens-core-color-gray-700: #5c6470;
+      --lens-core-color-blue-40: #0b4cce;
+
+      /* Spacing */
+      --lens-semantic-spacing-desktop-padding-1: 4px;
+      --lens-semantic-spacing-desktop-padding-2: 8px;
+      --lens-semantic-spacing-desktop-padding-3: 12px;
+      --lens-semantic-spacing-desktop-padding-4: 16px;
+      --lens-semantic-spacing-desktop-padding-5: 20px;
+      --lens-semantic-spacing-desktop-padding-6: 24px;
+      --lens-semantic-spacing-desktop-gap-2: 8px;
+      --lens-semantic-spacing-desktop-gap-3: 12px;
+      --lens-semantic-spacing-desktop-gap-4: 16px;
+
+      /* Border radius */
+      --lens-core-border-radius-2: 8px;
+      --lens-core-border-radius-3: 12px;
+
+      /* Shadows */
+      --lens-core-shadow-sm: 0 1px 2px 0 rgba(40, 46, 55, 0.08);
+      --lens-core-shadow-md: 0 4px 8px -2px rgba(40, 46, 55, 0.08), 0 2px 4px -2px rgba(40, 46, 55, 0.08);
+
+      /* Typography */
+      --lens-core-font-family-default: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* Base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
+      font-family: var(--lens-core-font-family-default);
+      background-color: var(--lens-semantic-color-background-container);
+      color: var(--lens-semantic-color-type-default);
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
+      min-height: 100vh;
     }
+
+    .container {
+      max-width: 448px;
+      margin: 0 auto;
+      padding: var(--lens-semantic-spacing-desktop-padding-6) var(--lens-semantic-spacing-desktop-padding-4);
+    }
+
+    .card {
+      background-color: var(--lens-semantic-color-surface-default);
+      border-radius: var(--lens-core-border-radius-2);
+      box-shadow: var(--lens-core-shadow-sm);
+      padding: var(--lens-semantic-spacing-desktop-padding-6);
+      margin-bottom: var(--lens-semantic-spacing-desktop-gap-4);
+    }
+
+    .month-title {
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 32px;
+      color: var(--lens-semantic-color-type-default);
+      margin-bottom: var(--lens-semantic-spacing-desktop-gap-2);
+    }
+
+    .compliance-ratio {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 40px;
+    }
+
+    .compliance-success {
+      color: var(--lens-core-color-green-50);
+    }
+
+    .compliance-error {
+      color: var(--lens-core-color-red-50);
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: var(--lens-core-font-family-default);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 20px;
+      height: 40px;
+      padding: 0 var(--lens-semantic-spacing-desktop-padding-4);
+      border-radius: var(--lens-core-border-radius-2);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--lens-semantic-spacing-desktop-gap-2);
+    }
+
+    .btn-primary {
+      background-color: var(--lens-semantic-color-action-primary-default);
+      color: var(--lens-semantic-color-action-primary-on-primary);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--lens-semantic-color-action-primary-hover);
+    }
+
+    .btn-primary:active {
+      background-color: var(--lens-semantic-color-action-primary-active);
+    }
+
+    .btn-secondary {
+      background-color: var(--lens-semantic-color-surface-default);
+      color: var(--lens-semantic-color-action-secondary-on-secondary);
+      border: 1px solid var(--lens-semantic-color-outline-fixed);
+      box-shadow: var(--lens-core-shadow-sm);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--lens-semantic-color-action-secondary-hover-fill);
+    }
+
+    .btn-secondary:active {
+      background-color: var(--lens-semantic-color-action-secondary-active-fill);
+    }
+
+    /* Navigation */
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--lens-semantic-spacing-desktop-gap-3);
+      margin-bottom: var(--lens-semantic-spacing-desktop-gap-4);
+    }
+
+    /* Calendar */
+    .weekday-headers {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: var(--lens-semantic-spacing-desktop-gap-2);
+      margin-bottom: var(--lens-semantic-spacing-desktop-gap-2);
+    }
+
+    .weekday-header {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 16px;
+      color: var(--lens-semantic-color-type-muted);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: var(--lens-semantic-spacing-desktop-gap-2);
+    }
+
     .day-tile {
       aspect-ratio: 1;
+      border-radius: var(--lens-core-border-radius-2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
       transition: all 0.2s ease;
       user-select: none;
+      border: 2px solid transparent;
     }
+
     .day-tile:active:not(.weekend) {
       transform: scale(0.95);
     }
-    .progress-bar-fill {
+
+    .day-tile.weekend {
+      background-color: var(--lens-core-color-gray-100);
+      color: var(--lens-semantic-color-type-disabled);
+      cursor: default;
+    }
+
+    .day-tile.home {
+      background-color: var(--lens-core-color-gray-200);
+      color: var(--lens-semantic-color-type-default);
+    }
+
+    .day-tile.office {
+      background-color: var(--lens-semantic-color-status-success-background);
+      color: var(--lens-semantic-color-status-success-text);
+    }
+
+    .day-tile.holiday {
+      background-color: #f5f0ff;
+      color: var(--lens-core-color-purple-50);
+    }
+
+    .day-tile.today {
+      border-color: var(--lens-core-color-blue-40);
+      box-shadow: 0 0 0 2px rgba(11, 76, 206, 0.2);
+    }
+
+    .day-icon {
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    /* Progress bar */
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--lens-semantic-spacing-desktop-gap-2);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--lens-semantic-color-type-default);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 12px;
+      background-color: var(--lens-core-color-gray-200);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
       transition: width 0.3s ease;
+    }
+
+    .progress-success {
+      background-color: var(--lens-core-color-green-50);
+    }
+
+    .progress-error {
+      background-color: var(--lens-core-color-red-50);
+    }
+
+    .progress-goal {
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--lens-semantic-color-type-muted);
+      text-align: center;
+      margin-top: var(--lens-semantic-spacing-desktop-gap-1);
+    }
+
+    /* Stats */
+    .stats-title {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 24px;
+      color: var(--lens-semantic-color-type-default);
+      margin-bottom: var(--lens-semantic-spacing-desktop-gap-3);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--lens-semantic-spacing-desktop-gap-2);
+    }
+
+    .stat-label {
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--lens-semantic-color-type-muted);
+    }
+
+    .stat-value {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 20px;
+      color: var(--lens-semantic-color-type-default);
+    }
+
+    .stat-row.total {
+      border-top: 1px solid var(--lens-semantic-color-ui-divider-default);
+      padding-top: var(--lens-semantic-spacing-desktop-gap-2);
+      margin-top: var(--lens-semantic-spacing-desktop-gap-2);
+    }
+
+    .stat-row.total .stat-label {
+      color: var(--lens-semantic-color-type-default);
+      font-weight: 600;
+    }
+
+    .stat-row.total .stat-value {
+      font-weight: 700;
     }
   </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-  <div class="max-w-md mx-auto px-4 py-6">
+<body>
+  <div class="container">
     <!-- Header with compliance ratio -->
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-4">
-      <h1 class="text-2xl font-bold text-gray-800 mb-2" id="monthName">Loading...</h1>
-      <div class="text-3xl font-bold" id="complianceRatio">— / — nap — —%</div>
+    <div class="card">
+      <h1 class="month-title" id="monthName">Loading...</h1>
+      <div class="compliance-ratio" id="complianceRatio">— / — days — —%</div>
     </div>
 
     <!-- Navigation -->
-    <div class="flex justify-between items-center mb-4">
-      <button id="prevMonth" class="px-4 py-2 bg-white rounded-lg shadow-sm text-gray-700 font-medium hover:bg-gray-50">
+    <div class="nav-container">
+      <button id="prevMonth" class="btn btn-secondary">
         ← Previous
       </button>
-      <button id="todayBtn" class="px-6 py-2 bg-blue-500 text-white rounded-lg shadow-sm font-medium hover:bg-blue-600">
+      <button id="todayBtn" class="btn btn-primary">
         Today
       </button>
-      <button id="nextMonth" class="px-4 py-2 bg-white rounded-lg shadow-sm text-gray-700 font-medium hover:bg-gray-50">
+      <button id="nextMonth" class="btn btn-secondary">
         Next →
       </button>
     </div>
 
     <!-- Calendar grid -->
-    <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+    <div class="card">
       <!-- Weekday headers -->
-      <div class="grid grid-cols-7 gap-2 mb-2">
-        <div class="text-center text-xs font-semibold text-gray-600">Mon</div>
-        <div class="text-center text-xs font-semibold text-gray-600">Tue</div>
-        <div class="text-center text-xs font-semibold text-gray-600">Wed</div>
-        <div class="text-center text-xs font-semibold text-gray-600">Thu</div>
-        <div class="text-center text-xs font-semibold text-gray-600">Fri</div>
-        <div class="text-center text-xs font-semibold text-gray-600">Sat</div>
-        <div class="text-center text-xs font-semibold text-gray-600">Sun</div>
+      <div class="weekday-headers">
+        <div class="weekday-header">Mon</div>
+        <div class="weekday-header">Tue</div>
+        <div class="weekday-header">Wed</div>
+        <div class="weekday-header">Thu</div>
+        <div class="weekday-header">Fri</div>
+        <div class="weekday-header">Sat</div>
+        <div class="weekday-header">Sun</div>
       </div>
 
       <!-- Calendar days -->
-      <div id="calendarGrid" class="grid grid-cols-7 gap-2">
+      <div id="calendarGrid" class="calendar-grid">
         <!-- Generated by JS -->
       </div>
     </div>
 
     <!-- Progress bar -->
-    <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
-      <div class="flex justify-between items-center mb-2">
-        <span class="text-sm font-medium text-gray-700">Office Ratio</span>
-        <span class="text-sm font-bold" id="progressPercent">—%</span>
+    <div class="card">
+      <div class="progress-label">
+        <span>Office Ratio</span>
+        <span id="progressPercent">—%</span>
       </div>
-      <div class="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-        <div id="progressBar" class="progress-bar-fill h-full bg-green-500 rounded-full" style="width: 0%"></div>
+      <div class="progress-track">
+        <div id="progressBar" class="progress-fill" style="width: 0%"></div>
       </div>
-      <div class="text-xs text-gray-500 mt-1 text-center">Goal: 50%</div>
+      <div class="progress-goal">Goal: 50%</div>
     </div>
 
     <!-- Stats section -->
-    <div class="bg-white rounded-lg shadow-sm p-4">
-      <h2 class="text-lg font-bold text-gray-800 mb-3">Statistics</h2>
-      <div class="space-y-2">
-        <div class="flex justify-between">
-          <span class="text-gray-600">✅ Office days:</span>
-          <span class="font-semibold" id="officeDays">0</span>
+    <div class="card">
+      <h2 class="stats-title">Statistics</h2>
+      <div>
+        <div class="stat-row">
+          <span class="stat-label">✅ Office days:</span>
+          <span class="stat-value" id="officeDays">0</span>
         </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">🏠 Home office days:</span>
-          <span class="font-semibold" id="homeDays">0</span>
+        <div class="stat-row">
+          <span class="stat-label">🏠 Home office days:</span>
+          <span class="stat-value" id="homeDays">0</span>
         </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">🎉 Holidays:</span>
-          <span class="font-semibold" id="holidayDays">0</span>
+        <div class="stat-row">
+          <span class="stat-label">🎉 Holidays:</span>
+          <span class="stat-value" id="holidayDays">0</span>
         </div>
-        <div class="border-t pt-2 mt-2 flex justify-between">
-          <span class="text-gray-800 font-medium">Total working days:</span>
-          <span class="font-bold" id="workingDays">0</span>
+        <div class="stat-row total">
+          <span class="stat-label">Total working days:</span>
+          <span class="stat-value" id="workingDays">0</span>
         </div>
       </div>
     </div>
@@ -296,37 +601,36 @@
         const today = isToday(currentDay);
 
         const tile = document.createElement('div');
-        tile.className = 'day-tile rounded-lg flex flex-col items-center justify-center text-sm font-medium cursor-pointer';
+        tile.className = 'day-tile';
 
         // Base styles
         if (weekend) {
-          tile.className += ' weekend bg-gray-100 text-gray-400 cursor-default';
+          tile.className += ' weekend';
         } else {
           // Apply status-based styling
           if (status === STATUS.OFFICE) {
-            tile.className += ' bg-green-500 text-white';
+            tile.className += ' office';
           } else if (status === STATUS.HOLIDAY) {
-            tile.className += ' bg-purple-500 text-white';
+            tile.className += ' holiday';
           } else {
-            tile.className += ' bg-gray-200 text-gray-700';
+            tile.className += ' home';
           }
         }
 
         // Today's highlight
         if (today) {
-          tile.className += ' ring-4 ring-blue-400 ring-offset-1';
+          tile.className += ' today';
         }
 
         // Day number
         const dayNum = document.createElement('div');
         dayNum.textContent = day;
-        dayNum.className = 'text-lg';
         tile.appendChild(dayNum);
 
         // Status icon
         if (!weekend && status !== STATUS.EMPTY) {
           const icon = document.createElement('div');
-          icon.className = 'text-xs mt-1';
+          icon.className = 'day-icon';
           icon.textContent = status === STATUS.OFFICE ? '✅' : '🎉';
           tile.appendChild(icon);
         }
@@ -351,7 +655,7 @@
       // Update compliance ratio
       const complianceText = `${stats.officeCount} / ${stats.workingDays} days — ${stats.officePercent}% ${stats.officePercent >= 50 ? '✅' : '❌'}`;
       document.getElementById('complianceRatio').textContent = complianceText;
-      document.getElementById('complianceRatio').className = `text-3xl font-bold ${stats.officePercent >= 50 ? 'text-green-600' : 'text-red-600'}`;
+      document.getElementById('complianceRatio').className = `compliance-ratio ${stats.officePercent >= 50 ? 'compliance-success' : 'compliance-error'}`;
 
       // Update stats
       document.getElementById('officeDays').textContent = stats.officeCount;
@@ -363,9 +667,8 @@
       const progressBar = document.getElementById('progressBar');
       const progressPercent = document.getElementById('progressPercent');
       progressBar.style.width = `${Math.min(stats.officePercent, 100)}%`;
-      progressBar.className = `progress-bar-fill h-full rounded-full ${stats.officePercent >= 50 ? 'bg-green-500' : 'bg-red-500'}`;
+      progressBar.className = `progress-fill ${stats.officePercent >= 50 ? 'progress-success' : 'progress-error'}`;
       progressPercent.textContent = `${stats.officePercent}%`;
-      progressPercent.className = `text-sm font-bold ${stats.officePercent >= 50 ? 'text-green-600' : 'text-red-600'}`;
     }
 
     // ============================================================================
