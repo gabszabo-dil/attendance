@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#3b82f6">
   <meta name="description" content="Office attendance tracker PWA">
   <title>Office Tracker</title>
@@ -86,7 +86,13 @@
     .container {
       max-width: 448px;
       margin: 0 auto;
-      padding: var(--lens-semantic-spacing-desktop-padding-6) var(--lens-semantic-spacing-desktop-padding-4);
+      padding: var(--lens-semantic-spacing-desktop-padding-4);
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: var(--lens-semantic-spacing-desktop-padding-3);
+      }
     }
 
     .card {
